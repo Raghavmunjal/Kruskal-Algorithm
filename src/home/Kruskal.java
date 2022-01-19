@@ -6,6 +6,7 @@ import java.util.Comparator;
 * Find(A): This operation tells to find the subset to which the element A belongs.
 
 * Initially, all elements are single element subsets.
+  The idea is to always attach smaller depth tree under the root of the deeper tree
     0 1 2
 
     Do Union By rank(0, 1)
@@ -18,6 +19,10 @@ import java.util.Comparator;
      /  \
     0    2
 
+
+* The idea of path compression
+  is to make the found root as parent of x so that we don't have to traverse all intermediate nodes again
+
 *  A minimum spanning tree has (V – 1) edges (graph with V vertices) and it contains no cycle.
 
 * Algorithm: The Kruskal's algorithm for finding MST works on a Greedy method:
@@ -25,6 +30,10 @@ import java.util.Comparator;
   2. Pick the smallest edge. Check if it forms a cycle with the spanning tree formed so far. If cycle is not formed, include this edge, else discard it.
   3. Repeat step 2 until there are (V-1) edges in the spanning tree.
 
+* Time complexity
+  Adding edge in priority queue - E log E
+  Initialize parent and rank array - V
+  Union and Find Operation - E alpha V
 * */
 
 public class Kruskal {

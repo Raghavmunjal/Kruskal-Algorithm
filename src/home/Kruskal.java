@@ -1,6 +1,31 @@
 package home;
 import java.util.Comparator;
 
+/*
+* Union(A, B): This operation tells to merge the sets containing elements A and B respectively by performing a Union operation on the sets.
+* Find(A): This operation tells to find the subset to which the element A belongs.
+
+* Initially, all elements are single element subsets.
+    0 1 2
+
+    Do Union By rank(0, 1)
+       1   2
+      /
+     0
+
+    Do Union By rank (1, 2)
+       1
+     /  \
+    0    2
+
+*  A minimum spanning tree has (V – 1) edges (graph with V vertices) and it contains no cycle.
+
+* Algorithm: The Kruskal's algorithm for finding MST works on a Greedy method:
+  1. Add All edges into Priority Queue i.e. Min Heap
+  2. Pick the smallest edge. Check if it forms a cycle with the spanning tree formed so far. If cycle is not formed, include this edge, else discard it.
+  3. Repeat step 2 until there are (V-1) edges in the spanning tree.
+
+* */
 
 public class Kruskal {
 
@@ -8,6 +33,16 @@ public class Kruskal {
         int V = 4; // Number of vertices in graph
         int E = 5; // Number of edges in graph
         Graph graph = new Graph(V, E);
+
+        /* Let us create following weighted graph
+            9
+        0---------1
+        |  \      |
+       5|   10\   |8
+        |       \ |
+        2---------3
+            7     */
+
 
         // add edge 0-1
         graph.addEdge(0,1,9);
@@ -24,26 +59,27 @@ public class Kruskal {
         // add edge 2-3
         graph.addEdge(2,3,7);
 
-        System.out.println(graph.mst());
+        System.out.println("Weight of mst "+ graph.mst());
 
     }
 
 }
 
 class Graph{
-    private final int  v;
-    private final int e;
+    private final int  V;
+    private final int E;
     private PriorityQueue<Edge> pq;
     Graph(int v,int e){
-        this.v = v;
-        this.e = e;
-        pq = new PriorityQueue<>(e,new CustomComparator());
+        V = v;
+        E = e;
+        pq = new PriorityQueue<>(e,new EdgeComparator());
     }
 
     public void addEdge(int src,int dest,int wt){
         pq.add(new Edge(src,dest,wt));
     }
 
+    // A utility function to find the subset of an element i.
     private int find(DisjointSet set[], int i) {
 
         // find root and make root as parent of i (path compression)
@@ -53,6 +89,7 @@ class Graph{
         return set[i].parent;
     }
 
+    //  A utility function to do union of two subsets
     private void union(DisjointSet set[], int x, int y) {
         int rootX = find(set, x);
         int rootY = find(set, y);
@@ -70,12 +107,14 @@ class Graph{
 
     public int mst(){
 
-        DisjointSet set[] = new DisjointSet[v];
-        for(int i=0; i<v; ++i){
-            set[i]=new DisjointSet();
+        DisjointSet set[] = new DisjointSet[V];
+        Edge output[] = new Edge[V-1];
+
+        for(int i=0; i<V; ++i){
+            set[i] = new DisjointSet();
         }
 
-        for (int i = 0; i < v; ++i) {
+        for (int i = 0; i <V; ++i) {
             set[i].parent = i;
             set[i].rank = 0;
         }
@@ -83,7 +122,7 @@ class Graph{
         int edges_picked = 0;
         int wt_mst = 0;
 
-        while(edges_picked < v-1 ){
+        while(edges_picked < V-1 ){
 
             Edge next_edge = pq.poll();
 
@@ -96,10 +135,14 @@ class Graph{
             if (x != y)
             {
                 union(set, x, y);
-                wt_mst+=next_edge.weight;
+                wt_mst += next_edge.weight;
+                output[edges_picked] = next_edge;
                 edges_picked++;
             }
             // Else discard the next_edge
+        }
+        for(int i=0;i<edges_picked;i++){
+            System.out.println(output[i].src+"----"+output[i].dest+"( "+output[i].weight+" )");
         }
         return wt_mst;
     }
@@ -120,7 +163,7 @@ class Edge {
     }
 }
 
-class CustomComparator implements Comparator<Edge> {
+class EdgeComparator implements Comparator<Edge> {
 
     public int compare(Edge e1,Edge e2)
     {
